@@ -1,4 +1,5 @@
 const User = require("../models/UsersModel");
+const bcrypt = require("bcrypt");
 
 exports.getAllUser = async (req, res) => {
   try {
@@ -7,55 +8,61 @@ exports.getAllUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: "error",
-      requsetId: req.requestId,
+      requestId: req.requestId,
       error: error.message,
     });
   }
 };
 
-exports.createNewUser = async (req, res) => {
+exports.postEditUser = async (req, res) => {
+  const { id, firstname, lastname, username, email, password } = req.body;
   try {
-    const { firstname, lastname, username, email, password } = req.body;
-    if (!firstname || !lastname || !username || !email || !password) {
-      return res.status(400).json({
-        status: "error",
-        requestId: req.requestId,
-        error: "All fields are mandatory",
-      });
-    }
-    if (password.length < 12) {
-      return res.json(400).json({
-        status: "error",
-        requestId: req.requestId,
-        error: "Password length should not be 12",
-      });
+    if (!id) {
+      return res
+        .json({
+          status: "error",
+          requestId: req.requestId,
+          message: "User Id Not Given",
+        })
+        .status(400);
     }
 
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-      return res.status(400).json({
-        status: "error",
-        requestId: req.requestId,
-        error: "Username or email already exists",
-      });
+    const user = await User.findById(id).exec();
+    if (!user) {
+      return res
+        .json({
+          status: "error",
+          requestId: request.requestId,
+          message: "User Not Found",
+        })
+        .status(400);
     }
-    const newUser = User({ firstname, lastname, username, email, password });
-    await newUser.save();
-    res.status(201).json({
-      status: "success",
-      requestId: req.requestId,
-      message: "user created",
-      user: {
-        id: newUser._id,
-        firstname: newUser.firstname,
-        email: newUser.email,
-      },
-    });
+
+    if (firstname) user.firstname = firstname;
+    if (lastname) user.lastname = lastname;
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) {
+      if (password.length < 12) {
+        return res
+          .json({
+            status: "error",
+            requestId: req.requestId,
+            message: "Password under 12 characters not acceptable",
+          })
+          .status(400);
+      }
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.save();
+    res.status(200).json({ message: "User updated successfully.", user });
   } catch (error) {
-    res.status(400).json({
+    return res.json({
       status: "error",
-      requsetId: req.requestId,
-      error: error.message,
+      requestId: req.requestId,
+      message: error.message,
     });
   }
 };
