@@ -1,5 +1,6 @@
 const User = require("../models/UsersModel");
 const generateToken = require("../utils/tokenCreator");
+
 exports.loginController = async (req, res) => {
   const { identifier, password } = req.body;
   if (!identifier || !password) {
