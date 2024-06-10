@@ -1,6 +1,7 @@
 const express = require("express");
 const userRoute = require("./src/routes/UserRoutes");
 const authRoute = require("./src/routes/AuthenticationRoutes");
+const adminRoute = require("./src/routes/AdminRoutes");
 const PORT = process.env.PORT || 4000;
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
@@ -21,7 +22,7 @@ app.use(reqId);
 
 mongoose
   .connect(MONGO_URL, {
-    useNewUrlParser: true,
+    // useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
@@ -42,6 +43,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoute);
 app.use("/auth", authRoute);
+app.use("/admin", adminRoute);
 
 app.all("*", (req, res) => {
   return res.json({ status: "error", message: "not found" }).status(404);
