@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// Helper function to get the log file path for the current date
 const getLogFilePath = () => {
   const date = new Date();
   const year = date.getFullYear();

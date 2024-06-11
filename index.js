@@ -2,7 +2,10 @@ const express = require("express");
 const userRoute = require("./src/routes/UserRoutes");
 const authRoute = require("./src/routes/AuthenticationRoutes");
 const adminRoute = require("./src/routes/AdminRoutes");
+const exploreRoute = require("./src/routes/ExploreRoutes");
 const PORT = process.env.PORT || 4000;
+const cors = require("cors");
+const session = require("express-session");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const reqId = require("./src/utils/requestId");
@@ -16,6 +19,9 @@ const MONGO_URL = process.env.MONGO_URL;
 // console.log(MONGO_URL);
 
 app.use(express.json());
+
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+
 app.use(loggerMiddleware);
 app.use(express.urlencoded({ extended: false }));
 app.use(reqId);
@@ -44,7 +50,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoute);
 app.use("/auth", authRoute);
 app.use("/admin", adminRoute);
-
+app.use("/api/explore", exploreRoute);
 app.all("*", (req, res) => {
   return res.json({ status: "error", message: "not found" }).status(404);
 });

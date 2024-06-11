@@ -1,7 +1,7 @@
 const AdminMiddleware = (req, res, next) => {
   const { username, password } = req.body;
   if (username === "admin" && password === "adminPassword") {
-    req.user = { username: "admin" };
+    req.session.user = { username: "admin" };
     next();
   } else {
     return res.status(401).json({
@@ -14,6 +14,7 @@ const AdminMiddleware = (req, res, next) => {
 
 const AuthCheckAdmin = (req, res, next) => {
   const { user } = req;
+  console.log(req.user);
   if (user && user.username === "admin") next();
   else {
     return res.status(403).json({

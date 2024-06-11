@@ -23,10 +23,13 @@ exports.loginController = async (req, res) => {
       });
     }
     const token = generateToken(user);
+
+    // res.header("auth-token", token).send(token);
+
     return res.status(200).json({
       status: "success",
       token,
-      user: { firstname: user.firstname, email: user.email },
+      user: { _id: user._id, email: user.email },
     });
   } catch (error) {
     return res.status(400).json({
@@ -74,6 +77,7 @@ exports.createUserController = async (req, res) => {
     });
     await User.save(newUser);
     const token = generateToken(newUser);
+    res.header("auth-token", token).send(token);
     res.status(201).json({
       status: "success",
       token,
