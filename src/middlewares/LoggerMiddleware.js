@@ -27,7 +27,7 @@ const loggerMiddleware = (req, res, next) => {
   const requestId = req.requestId || "N/A";
   const timeStamp = new Date().toISOString();
 
-  const requestLog = `[${timeStamp}] [Request] ${req.method} ${req.url} (Request ID: ${requestId})\nRequest Body: ${JSON.stringify(req.body)}\n`;
+  const requestLog = `[${timeStamp}] [Request] ${req.method} ${req.url} (Request ID: ${req.requestId})\nRequest Body: ${JSON.stringify(req.body)}\n`;
   fs.appendFile(logFilePath, requestLog, (err) => {
     if (err) {
       console.error("Error writing request log:", err);
